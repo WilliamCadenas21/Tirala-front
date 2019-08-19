@@ -15,11 +15,12 @@ export default class CreatePost extends Component {
         const newPost = {
             hashtag: this.state.hashtag,
             content: this.state.content,
-            author: this.state.username
+            author: this.state.userSelected
         }
         const res = await axios.post('http://localhost:4000/api/posts/', newPost)
+        
         if (res.data.status === 200) {
-
+            window.location.href = '/'
         } else {
             console.log('la nota no se puedo salvar')
         }
