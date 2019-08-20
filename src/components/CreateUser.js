@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import axios from 'axios'
+import usersController from '../controllers/usersController'
+
 export default class CreateUser extends Component {
 
     state = {
@@ -12,8 +13,12 @@ export default class CreateUser extends Component {
     }
 
     getUsers = async () => {
-        const res = await axios.get('http://localhost:4000/api/users')
-        this.setState({ users: res.data.users })
+        try {
+            const res = await usersController.getUsers()
+            this.setState({ users: res.data.users })
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     onChangeUserName = (e) => {
@@ -24,14 +29,19 @@ export default class CreateUser extends Component {
 
     onSubmit = async e => {
         e.preventDefault()
-        const res = await axios.post('http://localhost:4000/api/users', {
-            username: this.state.username
-        })
-        this.setState({ username: '' })
-        if (res.data.status === 200) {
-            this.getUsers()
-        } else {
-            console.log(res.data)
+        try {
+            const user = {
+                username: this.state.username
+            } 
+            const res = await usersController.createUser(user)
+            this.setState({ username: '' })
+            if (res.data.status === 200) {
+                this.getUsers()
+            } else {
+                throw res.data.message
+            }
+        } catch (e) {
+            console.log(e)
         }
     }
 

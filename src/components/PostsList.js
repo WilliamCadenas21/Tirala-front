@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import axios from 'axios'
 import { format } from 'timeago.js'
+import postsController from '../controllers/postsController'
 export default class PostsList extends Component {
-    
+
     state = {
         posts: []
     }
@@ -12,25 +12,34 @@ export default class PostsList extends Component {
     }
 
     async getPosts() {
-        const res =await axios.get('http://localhost:4000/api/posts/')
-        this.setState({posts: res.data.posts})
+        try {
+            const res = await postsController.getPosts()
+            this.setState({ posts: res.data.posts })
+        } catch (e) {
+            console.log(e)
+        }
+
     }
 
     deletePost = async (id) => {
-        const res = await axios.delete(`http://localhost:4000/api/posts/${id}`)
-        if (res.data.status === 200){
-            this.getPosts()
-        } else {
-            console.log('no se pudo borrar')
-        }
+        try {
+            const res = await postsController.getPosts(id)
+            if (res.data.status === 200) {
+                this.getPosts()
+            } else {
+                throw(res.data.message)
+            }
+        } catch (e) {
+            console.log(e)
+        }   
     }
 
-    
+
     render() {
         return (
             <div className="row">
                 {
-                    this.state.posts.map(post =>(
+                    this.state.posts.map(post => (
                         <div className="col-md-4 p2" key={post._id}>
                             <div className="card">
                                 <div className="card-header">
@@ -42,12 +51,12 @@ export default class PostsList extends Component {
                                     <p>{format(post.createdAt)}</p>
                                 </div>
                                 <div className="card-footer">
-                                    <button className="btn btn-danger" onClick={()=> this.deletePost(post._id)}>
+                                    <button className="btn btn-danger" onClick={() => this.deletePost(post._id)}>
                                         Delete
                                     </button>
                                 </div>
                             </div>
-                        </div>    
+                        </div>
                     ))
                 }
             </div>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import axios from 'axios'
-
+import postsController from '../controllers/postsController'
+import usersController from '../controllers/usersController'
 export default class CreatePost extends Component {
 
     state = {
@@ -17,14 +17,17 @@ export default class CreatePost extends Component {
             content: this.state.content,
             author: this.state.userSelected
         }
-        const res = await axios.post('http://localhost:4000/api/posts/', newPost)
-        
-        if (res.data.status === 200) {
-            window.location.href = '/'
-        } else {
-            console.log('la nota no se puedo salvar')
-        }
+        try {
+            const res = await postsController.createPost(newPost)
 
+            if (res.data.status === 200) {
+                window.location.href = '/'
+            } else {
+                throw res.data.message
+            }
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     async componentDidMount() {
@@ -32,11 +35,15 @@ export default class CreatePost extends Component {
     }
 
     getUsers = async () => {
-        const res = await axios.get('http://localhost:4000/api/users')
-        this.setState({
-            users: res.data.users,
-            userSelected: res.data.users[0].username
-        })
+        try {
+            const res = await usersController.getUsers()
+            this.setState({
+                users: res.data.users,
+                userSelected: res.data.users[0].username
+            })
+        } catch (e) {
+            console.log(e)
+        }
     }
 
     onInputChange = e => {
