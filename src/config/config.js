@@ -1,5 +1,5 @@
 //averiguar si esto se puede hacer con variables de entorno 
-const env = 'development'
+const env = 'production'
 
 const config = {
     development:{
